@@ -1,18 +1,22 @@
 import 'package:flutter/material.dart';
+
 import '../../models/grocery.dart';
 
 class NewItem extends StatefulWidget {
   const NewItem({super.key});
 
   @override
-  State<NewItem> createState() => _NewItemState();
+  State<NewItem> createState() {
+    return _NewItemState();
+  }
 }
 
 class _NewItemState extends State<NewItem> {
-  // Default settings 
-  static const defaultName = "New grocery";
+  // Default settings
+  static const defautName = "New grocery";
   static const defaultQuantity = 1;
   static const defaultCategory = GroceryCategory.fruit;
+
   // Inputs
   final _nameController = TextEditingController();
   final _quantityController = TextEditingController();
@@ -21,41 +25,36 @@ class _NewItemState extends State<NewItem> {
   @override
   void initState() {
     super.initState();
+
     // Initialize intputs with default settings
-    _nameController.text = defaultName;
+    _nameController.text = defautName;
     _quantityController.text = defaultQuantity.toString();
   }
 
   @override
   void dispose() {
+    super.dispose();
+
     // Dispose the controlers
     _nameController.dispose();
     _quantityController.dispose();
-    super.dispose();
   }
 
   void onReset() {
     // Will be implemented later - Reset all fields to the initial values
-    setState(() {
-      _nameController.text = defaultName;
-      _quantityController.text = defaultQuantity.toString();
-      _selectedCategory = defaultCategory;
-    });
   }
 
   void onAdd() {
-    // Will be implemented later - Create and return the new grocery
-    final name = _nameController.text;
-    final qty = int.tryParse(_quantityController.text) ?? 1;
-
-    final newGrocery = Grocery(
-      id: DateTime.now().toString(),
+    String name = _nameController.text;
+    int? quantity = int.tryParse(_quantityController.text);
+    GroceryCategory category = _selectedCategory;
+    Grocery newGrocery = Grocery(
+      id: "",
       name: name,
-      quantity: qty,
-      category: _selectedCategory,
+      quantity: quantity!,
+      category: category,
     );
-
-    Navigator.pop(context, newGrocery); 
+    Navigator.of(context).pop<Grocery>(newGrocery);
   }
 
   @override
@@ -69,7 +68,7 @@ class _NewItemState extends State<NewItem> {
             TextField(
               controller: _nameController,
               maxLength: 50,
-              decoration: const InputDecoration(labelText: 'Name'),
+              decoration: const InputDecoration(label: Text('Name')),
             ),
             const SizedBox(height: 10),
             Row(
@@ -78,32 +77,27 @@ class _NewItemState extends State<NewItem> {
                 Expanded(
                   child: TextField(
                     controller: _quantityController,
-                    keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(labelText: 'Quantity'),
+                    decoration: const InputDecoration(label: Text('Quantity')),
                   ),
                 ),
                 const SizedBox(width: 8),
                 Expanded(
                   child: DropdownButtonFormField<GroceryCategory>(
-                    value: _selectedCategory,
-                    items: GroceryCategory.values
-                        .map(
-                          (g) => DropdownMenuItem(
-                            value: g,
-                            child: Row(
-                              children: [
-                                Container(
-                                  width: 15,
-                                  height: 15,
-                                  color: g.color,
-                                ),
-                                const SizedBox(width: 10),
-                                Text(g.label),
-                              ],
-                            ),
+                    initialValue: _selectedCategory,
+                    items: [
+                      ...GroceryCategory.values.map(
+                        (c) => DropdownMenuItem(
+                          value: c,
+                          child: Row(
+                            children: [
+                              Container(color: c.color, width: 15, height: 15),
+                              const SizedBox(width: 5),
+                              Text(c.label),
+                            ],
                           ),
-                        )
-                        .toList(),
+                        ),
+                      ),
+                    ],
                     onChanged: (value) {
                       if (value != null) {
                         setState(() {
